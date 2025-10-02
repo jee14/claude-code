@@ -1,5 +1,5 @@
 {
-  "defaultMode": "acceptEdits",
+  "defaultMode": "bypassPermissions",
   "permissions": {
     "allow": [
       "Edit",
@@ -7,12 +7,12 @@
       "Read",
       "Bash(pip install:*)",
       "Bash(ruff:*)",
-      "Bash(git status:*)",
-      "Bash(git diff:*)",
-      "Bash(git log:*)",
+      "Bash(git:*)",
       "Bash(ls:*)",
       "Bash(mkdir:*)",
       "Bash(source:*)",
+      "Bash(npm:*)",
+      "Bash(pytest:*)",
       "WebSearch",
       "WebFetch"
     ],
