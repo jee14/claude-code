@@ -18,6 +18,22 @@ app = FastAPI(
     version="2.0.0"
 )
 
+# Configure JSON response to use UTF-8 encoding with ensure_ascii=False
+from fastapi.responses import JSONResponse
+import json
+
+class UTF8JSONResponse(JSONResponse):
+    def render(self, content) -> bytes:
+        return json.dumps(
+            content,
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=None,
+            separators=(",", ":"),
+        ).encode("utf-8")
+
+app.default_response_class = UTF8JSONResponse
+
 # CORS middleware for frontend
 app.add_middleware(
     CORSMiddleware,

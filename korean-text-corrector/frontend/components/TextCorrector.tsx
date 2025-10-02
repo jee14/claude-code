@@ -155,6 +155,12 @@ export default function TextCorrector() {
 
       const data = await response.json()
 
+      // Debug: log the response
+      console.log('API Response:', data)
+      console.log('Original text:', data.original)
+      console.log('Corrected text:', data.corrected)
+      console.log('Corrections:', data.corrections)
+
       // Transform backend response to frontend format
       const corrections: Correction[] = (data.corrections || []).map((c: any, idx: number) => {
         // Find position of original text
