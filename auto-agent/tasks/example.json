@@ -1,16 +1,16 @@
 {
   "name": "FastAPI TODO API",
-  "description": "FastAPI를 사용해서 간단한 TODO API를 만들어주세요",
+  "description": "Create a simple TODO API using FastAPI",
   "requirements": [
-    "FastAPI 프레임워크 사용",
-    "CRUD 기능 (Create, Read, Update, Delete)",
-    "Pydantic 모델 사용",
-    "테스트 코드 작성",
-    "README.md 작성"
+    "Use FastAPI framework",
+    "CRUD functionality (Create, Read, Update, Delete)",
+    "Use Pydantic models",
+    "Write test code",
+    "Create README.md"
   ],
   "success_criteria": [
-    "모든 API 엔드포인트가 동작함",
-    "테스트 코드가 모두 통과함",
-    "코드가 PEP8을 준수함"
+    "All API endpoints work",
+    "All tests pass",
+    "Code follows PEP8"
   ]
 }

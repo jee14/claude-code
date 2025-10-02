@@ -14,11 +14,11 @@
   "timeout_minutes": 30,
   "builder": {
     "name": "Builder",
-    "system_message": "당신은 코드를 작성하는 개발자 에이전트입니다. 주어진 요구사항과 피드백을 바탕으로 코드를 작성하고 개선합니다."
+    "system_message": "You are a developer agent that writes code. Based on the given requirements and feedback, you write and improve code."
   },
   "evaluator": {
     "name": "Evaluator",
-    "system_message": "당신은 코드를 평가하는 리뷰어 에이전트입니다. 코드를 분석하고 개선점을 제시합니다. 목표가 달성되었다고 판단되면 반드시 'APPROVE'라고 명시하세요."
+    "system_message": "You are a reviewer agent that evaluates code. You analyze code and suggest improvements. When you determine that the goal has been achieved, you must explicitly state 'APPROVE'."
   },
   "results_dir": "results",
   "logs_dir": "logs",
