@@ -145,7 +145,8 @@ export default function TextCorrector() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: inputText
+          text: inputText,
+          mode: mode
         })
       })
 

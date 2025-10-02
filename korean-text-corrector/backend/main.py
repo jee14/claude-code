@@ -11,6 +11,8 @@ import uvicorn
 
 # Import correction engine
 from correction_rules import KoreanCorrector, quick_correct, detailed_correct
+from korean_spell_checker import KoreanSpellChecker
+from openai_corrector import OpenAICorrector
 
 app = FastAPI(
     title="Korean Text Corrector API",
@@ -47,6 +49,7 @@ app.add_middleware(
 class CorrectionRequest(BaseModel):
     text: str
     detailed: Optional[bool] = False
+    mode: Optional[str] = "proofreading"  # proofreading, copyediting, rewriting
 
 class QuickCorrectionResponse(BaseModel):
     original: str
@@ -65,8 +68,10 @@ class HealthResponse(BaseModel):
     version: str
     message: str
 
-# Initialize corrector
+# Initialize correctors
 corrector = KoreanCorrector()
+spell_checker = KoreanSpellChecker()
+openai_corrector = OpenAICorrector()
 
 @app.get("/", response_model=HealthResponse)
 async def root():
@@ -110,17 +115,23 @@ async def correct_text(request: CorrectionRequest):
 @app.post("/correct/detailed", response_model=DetailedCorrectionResponse)
 async def correct_text_detailed(request: CorrectionRequest):
     """
-    Detailed text correction endpoint
+    Detailed text correction endpoint using OpenAI GPT
     Returns corrected text with detailed analysis and correction log
+
+    Modes:
+    - proofreading: 맞춤법, 띄어쓰기, 문장부호 교정
+    - copyediting: 문맥 일관성, 용어 통일, 중복 표현 검토
+    - rewriting: 문장 구조 개선, 가독성 향상
     """
     try:
         if not request.text or request.text.strip() == "":
             raise HTTPException(status_code=400, detail="Text cannot be empty")
-        
-        analysis = detailed_correct(request.text)
-        
+
+        # Use OpenAI corrector for reliable results
+        analysis = openai_corrector.correct(request.text, request.mode)
+
         return analysis
-    
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Correction error: {str(e)}")
 
