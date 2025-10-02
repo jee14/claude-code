@@ -1,0 +1,25 @@
+{
+  "provider": "openrouter",
+  "api_key_env": "OPENROUTER_API_KEY",
+  "model_env": "OPENROUTER_MODEL",
+  "available_models": [
+    "x-ai/grok-code-fast-1",
+    "openai/gpt-5",
+    "google/gemini-2.5-pro",
+    "anthropic/claude-sonnet-4.5",
+    "deepseek/deepseek-chat-v3.1:free"
+  ],
+  "base_url": "https://openrouter.ai/api/v1",
+  "max_iterations": 10,
+  "timeout_minutes": 30,
+  "builder": {
+    "name": "Builder",
+    "system_message": "당신은 코드를 작성하는 개발자 에이전트입니다. 주어진 요구사항과 피드백을 바탕으로 코드를 작성하고 개선합니다."
+  },
+  "evaluator": {
+    "name": "Evaluator",
+    "system_message": "당신은 코드를 평가하는 리뷰어 에이전트입니다. 코드를 분석하고 개선점을 제시합니다. 목표가 달성되었다고 판단되면 반드시 'APPROVE'라고 명시하세요."
+  },
+  "results_dir": "results",
+  "logs_dir": "logs"
+}
