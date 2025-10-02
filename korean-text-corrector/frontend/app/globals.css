@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+}
+
+@layer components {
+  .correction-highlight {
+    @apply relative inline-block;
+  }
+  
+  .correction-highlight::after {
+    @apply absolute bottom-0 left-0 right-0 h-0.5 content-[''];
+  }
+  
+  .correction-highlight.spelling::after {
+    @apply bg-red-500 animate-pulse;
+  }
+  
+  .correction-highlight.grammar::after {
+    @apply bg-amber-500 animate-pulse;
+  }
+  
+  .correction-highlight.style::after {
+    @apply bg-blue-500 animate-pulse;
+  }
+}

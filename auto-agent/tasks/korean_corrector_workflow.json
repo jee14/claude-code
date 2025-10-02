@@ -1,0 +1,26 @@
+{
+  "name": "한국어 교정 도구 전체 개발",
+  "description": "한국어 교정, 교열, 윤문 기능을 제공하는 웹 서비스 구축",
+  "tasks": [
+    {
+      "name": "백엔드 API 서버 구축",
+      "task": "FastAPI를 사용하여 한국어 교정 백엔드 API를 만들어주세요. POST /api/correct 엔드포인트에 {text: string, mode: 'proofreading'|'copyediting'|'rewriting'} 받아서 {original: string, corrected: string, corrections: [{type: string, original: string, corrected: string, explanation: string, position: {start: number, end: number}}]} 형식으로 반환. 실제 교정은 간단한 규칙 기반으로 구현."
+    },
+    {
+      "name": "한국어 교정 엔진 개선",
+      "task": "백엔드의 한국어 교정 로직을 개선해주세요. 자주 틀리는 맞춤법(됬→됐, 어떻해→어떡해 등), 띄어쓰기 규칙, 문장부호 사용법을 체크하는 함수들을 추가. correction_rules.py 파일에 규칙들을 정리."
+    },
+    {
+      "name": "프론트엔드 API 연동",
+      "task": "frontend/components/TextCorrector.tsx를 수정하여 실제 백엔드 API와 연동하도록 수정. fetch를 사용하여 http://localhost:8000/api/correct 호출하고 결과 표시. 에러 처리와 로딩 상태도 개선."
+    },
+    {
+      "name": "Docker 컨테이너화",
+      "task": "프론트엔드와 백엔드를 Docker로 컨테이너화. docker-compose.yml 작성하여 한 번에 실행 가능하도록. 프론트엔드는 3000번, 백엔드는 8000번 포트 사용."
+    },
+    {
+      "name": "테스트 코드 작성",
+      "task": "백엔드 API에 대한 테스트 코드 작성. pytest를 사용하여 각 교정 모드별 테스트 케이스 추가. 최소 10개 이상의 테스트 케이스 포함."
+    }
+  ]
+}
