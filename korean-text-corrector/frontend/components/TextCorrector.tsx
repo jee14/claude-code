@@ -134,30 +134,72 @@ export default function TextCorrector() {
 
   const handleCorrection = async (mode: CorrectionType) => {
     if (!inputText.trim()) return
-    
+
     setIsProcessing(true)
-    
-    // 실제로는 API 호출
-    setTimeout(() => {
+
+    try {
+      // Call backend API with detailed analysis
+      const response = await fetch('http://localhost:8000/correct/detailed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: inputText
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+
+      // Transform backend response to frontend format
+      const corrections: Correction[] = (data.corrections || []).map((c: any, idx: number) => {
+        // Find position of original text
+        const startIndex = data.original.indexOf(c.original)
+        const endIndex = startIndex + c.original.length
+
+        return {
+          id: `${c.type}-${idx}`,
+          type: c.type === 'spelling' ? 'spelling' as const : 'grammar' as const,
+          original: c.original,
+          corrected: c.corrected,
+          explanation: `${c.original} → ${c.corrected}`,
+          startIndex: startIndex >= 0 ? startIndex : 0,
+          endIndex: endIndex >= 0 ? endIndex : 0
+        }
+      })
+
+      setResult({
+        originalText: data.original,
+        correctedText: data.corrected,
+        corrections,
+        mode
+      })
+    } catch (error) {
+      console.error('Correction error:', error)
+      // Fallback to mock if API fails
       const corrections = mockCorrections[mode](inputText)
       let correctedText = inputText
-      
-      // 수정사항 적용 (뒤에서부터 적용해야 인덱스가 안 깨짐)
+
       corrections.sort((a, b) => b.startIndex - a.startIndex).forEach(correction => {
-        correctedText = 
-          correctedText.slice(0, correction.startIndex) + 
-          correction.corrected + 
+        correctedText =
+          correctedText.slice(0, correction.startIndex) +
+          correction.corrected +
           correctedText.slice(correction.endIndex)
       })
-      
+
       setResult({
         originalText: inputText,
         correctedText,
         corrections: corrections.sort((a, b) => a.startIndex - b.startIndex),
         mode
       })
+    } finally {
       setIsProcessing(false)
-    }, 1000)
+    }
   }
 
   const getModeDescription = (mode: CorrectionType) => {

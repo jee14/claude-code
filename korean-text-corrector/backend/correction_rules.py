@@ -241,7 +241,7 @@ class KoreanCorrector:
 
 # Utility functions for external use
 def quick_correct(text: str) -> str:
-    """Quick correction without detailed analysis"""
+    """Quick correction using rule-based approach"""
     corrector = KoreanCorrector()
     corrected, _ = corrector.correct_all(text)
     return corrected
@@ -250,4 +250,5 @@ def quick_correct(text: str) -> str:
 def detailed_correct(text: str) -> Dict:
     """Detailed correction with analysis"""
     corrector = KoreanCorrector()
-    return corrector.analyze_text(text)
+    result = corrector.analyze_text(text)
+    return result

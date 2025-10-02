@@ -1,35 +1,50 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-@layer base {
-  :root {
-    --radius: 0.5rem;
-  }
-  
-  body {
-    @apply bg-gray-50 text-gray-900 antialiased;
-  }
+:root {
+  --radius: 0.5rem;
 }
 
-@layer components {
-  .correction-highlight {
-    @apply relative inline-block;
+body {
+  background-color: rgb(249 250 251);
+  color: rgb(17 24 39);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.correction-highlight {
+  position: relative;
+  display: inline-block;
+}
+
+.correction-highlight::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.correction-highlight.spelling::after {
+  background-color: rgb(239 68 68);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.correction-highlight.grammar::after {
+  background-color: rgb(245 158 11);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.correction-highlight.style::after {
+  background-color: rgb(59 130 246);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
   }
-  
-  .correction-highlight::after {
-    @apply absolute bottom-0 left-0 right-0 h-0.5 content-[''];
-  }
-  
-  .correction-highlight.spelling::after {
-    @apply bg-red-500 animate-pulse;
-  }
-  
-  .correction-highlight.grammar::after {
-    @apply bg-amber-500 animate-pulse;
-  }
-  
-  .correction-highlight.style::after {
-    @apply bg-blue-500 animate-pulse;
+  50% {
+    opacity: 0.5;
   }
 }
