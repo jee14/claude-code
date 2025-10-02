@@ -1,4 +1,4 @@
-pyautogen
-openai
+pyautogen<0.3
+openai<1
 python-dotenv
 pyyaml

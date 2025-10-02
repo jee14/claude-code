@@ -59,7 +59,19 @@ def setup_agents(config):
         llm_config=llm_config,
     )
 
-    return builder, evaluator
+    # UserProxy 에이전트 (코드 실행 및 파일 저장)
+    user_proxy = autogen.UserProxyAgent(
+        name="user_proxy",
+        human_input_mode="NEVER",  # 자동 실행
+        max_consecutive_auto_reply=10,  # 자동 응답 허용
+        is_termination_msg=is_termination_msg,  # APPROVE 시 종료
+        code_execution_config={
+            "work_dir": config.get("output_dir", "generated_code"),
+            "use_docker": False,
+        },
+    )
+
+    return builder, evaluator, user_proxy
 
 
 def is_termination_msg(msg):
@@ -98,16 +110,16 @@ def save_results(chat_history, task, config):
 def run_autonomous_agents(task: str):
     """자율 에이전트 실행"""
     config = load_config()
-    builder, evaluator = setup_agents(config)
+    builder, evaluator, user_proxy = setup_agents(config)
 
     print(f"🚀 자율 에이전트 시작")
     print(f"📋 작업: {task}")
     print(f"🔄 최대 반복: {config['max_iterations']}")
     print("-" * 60)
 
-    # GroupChat 설정
+    # GroupChat 설정 (UserProxy 추가)
     groupchat = autogen.GroupChat(
-        agents=[builder, evaluator],
+        agents=[user_proxy, builder, evaluator],
         messages=[],
         max_round=config["max_iterations"],
     )
@@ -118,10 +130,9 @@ def run_autonomous_agents(task: str):
     )
 
     # 대화 시작
-    builder.initiate_chat(
+    user_proxy.initiate_chat(
         manager,
         message=task,
-        is_termination_msg=is_termination_msg,
     )
 
     # 결과 저장

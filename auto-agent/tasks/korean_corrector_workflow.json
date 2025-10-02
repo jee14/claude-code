@@ -4,23 +4,23 @@
   "tasks": [
     {
       "name": "Build Backend API Server",
-      "task": "Create a Korean text correction backend API using FastAPI. Implement POST /api/correct endpoint that receives {text: string, mode: 'proofreading'|'copyediting'|'rewriting'} and returns {original: string, corrected: string, corrections: [{type: string, original: string, corrected: string, explanation: string, position: {start: number, end: number}}]} format. Implement actual correction with simple rule-based logic."
+      "task": "Create a Korean text correction backend API using FastAPI. Save the code to '../korean-text-corrector/backend/main.py'. Implement POST /api/correct endpoint that receives {text: string, mode: 'proofreading'|'copyediting'|'rewriting'} and returns {original: string, corrected: string, corrections: [{type: string, original: string, corrected: string, explanation: string, position: {start: number, end: number}}]} format. Implement actual correction with simple rule-based logic. MUST write the actual file using Python file operations."
     },
     {
       "name": "Improve Korean Correction Engine",
-      "task": "Improve the Korean correction logic in the backend. Add functions to check common spelling mistakes (됬→됐, 어떻해→어떡해, etc.), spacing rules, and punctuation usage. Organize rules in a correction_rules.py file."
+      "task": "Improve the Korean correction logic in the backend. Read the existing '../korean-text-corrector/backend/main.py' file, improve it, and save the changes. Add functions to check common spelling mistakes (됬→됐, 어떻해→어떡해, etc.), spacing rules, and punctuation usage. Create '../korean-text-corrector/backend/correction_rules.py' file with organized rules. MUST write actual files."
     },
     {
       "name": "Frontend API Integration",
-      "task": "Modify frontend/components/TextCorrector.tsx to integrate with the actual backend API. Use fetch to call http://localhost:8000/api/correct and display results. Improve error handling and loading states."
+      "task": "Read and modify '../korean-text-corrector/frontend/components/TextCorrector.tsx' to integrate with the actual backend API. Use fetch to call http://localhost:8000/api/correct and display results. Improve error handling and loading states. Save the modified file. MUST write actual file."
     },
     {
       "name": "Dockerize",
-      "task": "Dockerize frontend and backend. Write docker-compose.yml to run everything at once. Frontend on port 3000, backend on port 8000."
+      "task": "Create '../korean-text-corrector/docker-compose.yml', '../korean-text-corrector/backend/Dockerfile', and '../korean-text-corrector/frontend/Dockerfile' to dockerize the application. Frontend on port 3000, backend on port 8000. MUST write actual files."
     },
     {
       "name": "Write Test Code",
-      "task": "Write test code for backend API. Use pytest to add test cases for each correction mode. Include at least 10 test cases."
+      "task": "Create '../korean-text-corrector/backend/test_main.py' with pytest test cases for the backend API. Test each correction mode (proofreading, copyediting, rewriting). Include at least 10 test cases. MUST write actual file."
     }
   ]
 }

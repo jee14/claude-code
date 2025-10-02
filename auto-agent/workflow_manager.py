@@ -62,40 +62,40 @@ class WorkflowManager:
     
     def run_single_task(self, task: Dict[str, Any], task_idx: int, previous_results: List[Dict] = None):
         """단일 작업 실행"""
-        builder, evaluator = setup_agents(self.config)
-        
+        from main import is_termination_msg
+        builder, evaluator, user_proxy = setup_agents(self.config)
+
         # 이전 작업 결과를 컨텍스트로 포함
         context = ""
         if previous_results:
-            context = "\n\n=== 이전 작업 결과 ===\n"
+            context = "\n\n=== Previous Task Results ===\n"
             for prev in previous_results[-2:]:  # 최근 2개만
                 context += f"\n[{prev['name']}]\n{prev['summary']}\n"
-        
-        task_message = f"{context}\n\n현재 작업: {task['task']}"
-        
+
+        task_message = f"{context}\n\nCurrent Task: {task['task']}"
+
         print(f"\n{'='*60}")
         print(f"📌 작업 {task_idx + 1}: {task.get('name', 'Unnamed Task')}")
         print(f"📋 내용: {task['task']}")
         print(f"{'='*60}\n")
-        
-        # GroupChat 설정
+
+        # GroupChat 설정 (UserProxy 추가)
         groupchat = autogen.GroupChat(
-            agents=[builder, evaluator],
+            agents=[user_proxy, builder, evaluator],
             messages=[],
             max_round=self.config["max_iterations"],
         )
-        
+
         # ChatManager 설정
         manager = autogen.GroupChatManager(
-            groupchat=groupchat, 
+            groupchat=groupchat,
             llm_config=builder.llm_config
         )
-        
+
         # 대화 시작
-        builder.initiate_chat(
+        user_proxy.initiate_chat(
             manager,
             message=task_message,
-            is_termination_msg=is_termination_msg,
         )
         
         # 결과 추출

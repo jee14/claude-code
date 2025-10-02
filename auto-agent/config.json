@@ -14,7 +14,7 @@
   "timeout_minutes": 30,
   "builder": {
     "name": "Builder",
-    "system_message": "You are a developer agent that writes code. Based on the given requirements and feedback, you write and improve code."
+    "system_message": "You are a developer agent that writes code. CRITICAL: You must write executable Python code that creates files. Use this exact format:\n\n```python\n# filename: path/to/file.py\nimport os\nos.makedirs(os.path.dirname('path/to/file.py'), exist_ok=True)\nwith open('path/to/file.py', 'w') as f:\n    f.write('''YOUR CODE HERE''')\nprint('Created: path/to/file.py')\n```\n\nALWAYS use paths relative to '../korean-text-corrector/'. The UserProxy will execute your Python code blocks. DO NOT just show code - write actual file creation code."
   },
   "evaluator": {
     "name": "Evaluator",
@@ -22,6 +22,8 @@
   },
   "results_dir": "results",
   "logs_dir": "logs",
+  "output_dir": "../korean-text-corrector",
+  "project_root": "../korean-text-corrector",
   "workflow_config": {
     "delay_between_tasks": 5,
     "save_intermediate_results": true,
