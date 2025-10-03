@@ -247,8 +247,8 @@ export default function TextCorrector() {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold mb-2">한국어 교정 도구</h1>
-        <p className="text-gray-600 mb-8">텍스트를 입력하고 원하는 교정 모드를 선택하세요.</p>
+        <h1 className="text-3xl font-bold mb-2">한국어 문장 다듬기</h1>
+        <p className="text-gray-600 mb-8">텍스트를 입력하고 원하는 기능을 선택하세요.</p>
         
         <div className="space-y-6">
           <div>
@@ -258,7 +258,7 @@ export default function TextCorrector() {
             <textarea
               id="input-text"
               className="w-full h-40 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-              placeholder="교정할 텍스트를 입력하세요... (최대 1000자)"
+              placeholder="텍스트를 입력하세요... (최대 1000자)"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               maxLength={1000}
