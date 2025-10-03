@@ -5,7 +5,7 @@ OpenRouter API를 사용한 한국어 문장 다듬기 (Claude 등 다양한 모
 import os
 from typing import Dict, List
 import json
-from langfuse import Langfuse
+from langfuse import Langfuse, observe, get_client
 
 
 class OpenAICorrector:
@@ -32,6 +32,7 @@ class OpenAICorrector:
         if not self.api_key:
             print("Warning: OPENROUTER_API_KEY not set. Corrector will not work.")
 
+    @observe(name="korean-text-correction")
     def correct(self, text: str, mode: str = "proofreading") -> Dict:
         """
         텍스트 교정 실행
@@ -46,9 +47,17 @@ class OpenAICorrector:
         if not self.api_key:
             return self._fallback_result(text)
 
+        # Langfuse trace에 메타데이터 추가
+        langfuse_client = get_client()
+        langfuse_client.update_current_trace(
+            metadata={"mode": mode, "text_length": len(text)}
+        )
+
         try:
-            import openai
-            client = openai.OpenAI(
+            from openai import OpenAI
+
+            # OpenAI 클라이언트 생성
+            client = OpenAI(
                 api_key=self.api_key,
                 base_url=self.base_url
             )
@@ -110,6 +119,7 @@ class OpenAICorrector:
 
             prompt = prompt_template.format(text=text)
 
+            # LLM 호출 (@observe 데코레이터가 자동으로 트레이싱)
             response = client.chat.completions.create(
                 model=self.model,
                 messages=[
@@ -140,7 +150,7 @@ class OpenAICorrector:
                     'explanation': change.get('explanation', '')
                 })
 
-            return {
+            final_result = {
                 'original': text,
                 'corrected': result.get('corrected', text),
                 'has_corrections': len(corrections) > 0,
@@ -152,8 +162,28 @@ class OpenAICorrector:
                 }
             }
 
+            # Langfuse에 결과 메타데이터 추가
+            langfuse_client.update_current_span(
+                metadata={
+                    "num_corrections": len(corrections),
+                    "success": True
+                }
+            )
+
+            return final_result
+
         except Exception as e:
             print(f"OpenAI API Error: {e}")
+
+            # Langfuse에 에러 기록
+            langfuse_client = get_client()
+            langfuse_client.update_current_span(
+                metadata={
+                    "error": str(e),
+                    "success": False
+                }
+            )
+
             return self._fallback_result(text, str(e))
 
     def _fallback_result(self, text: str, error_msg: str = "OpenRouter API key not configured") -> Dict:

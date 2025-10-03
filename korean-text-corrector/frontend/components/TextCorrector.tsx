@@ -176,7 +176,7 @@ export default function TextCorrector() {
           type: c.type === 'spelling' ? 'spelling' as const : 'grammar' as const,
           original: c.original,
           corrected: c.corrected,
-          explanation: `${c.original} → ${c.corrected}`,
+          explanation: c.explanation || `${c.original} → ${c.corrected}`,
           startIndex: startIndex >= 0 ? startIndex : 0,
           endIndex: endIndex >= 0 ? endIndex : 0
         }
@@ -356,32 +356,40 @@ export default function TextCorrector() {
                     수정 내역 <span className="text-slate-500">({result.corrections.length}개)</span>
                   </h4>
                   <div className="space-y-2">
-                    {result.corrections.map((correction) => (
-                      <div
-                        key={correction.id}
-                        className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors"
-                      >
-                        <div className={`w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 ${
-                          correction.type === 'spelling' ? 'bg-red-400' :
-                          correction.type === 'grammar' ? 'bg-amber-400' :
-                          'bg-blue-400'
-                        }`} />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <span className="text-slate-400 line-through text-sm">
-                              {correction.original}
-                            </span>
-                            <span className="text-slate-300">→</span>
-                            <span className="font-medium text-emerald-600 text-sm">
-                              {correction.corrected}
-                            </span>
+                    {result.corrections.map((correction) => {
+                      const typeConfig = {
+                        spelling: { color: 'red', label: '맞춤법/띄어쓰기', bgColor: 'bg-red-50', borderColor: 'border-red-200', badgeColor: 'bg-red-100 text-red-700' },
+                        grammar: { color: 'amber', label: '문법/일관성', bgColor: 'bg-amber-50', borderColor: 'border-amber-200', badgeColor: 'bg-amber-100 text-amber-700' },
+                        style: { color: 'blue', label: '문체/구조', bgColor: 'bg-blue-50', borderColor: 'border-blue-200', badgeColor: 'bg-blue-100 text-blue-700' }
+                      }[correction.type]
+
+                      return (
+                        <div
+                          key={correction.id}
+                          className={`flex items-start gap-3 p-4 ${typeConfig.bgColor} rounded-xl border ${typeConfig.borderColor} hover:shadow-sm transition-all`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${typeConfig.badgeColor}`}>
+                                {typeConfig.label}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 mb-2 flex-wrap">
+                              <span className="text-slate-500 line-through text-sm">
+                                {correction.original}
+                              </span>
+                              <span className="text-slate-400">→</span>
+                              <span className="font-semibold text-emerald-700 text-sm">
+                                {correction.corrected}
+                              </span>
+                            </div>
+                            <p className="text-sm text-slate-700 leading-relaxed">
+                              {correction.explanation}
+                            </p>
                           </div>
-                          <p className="text-xs text-slate-600 leading-relaxed">
-                            {correction.explanation}
-                          </p>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               )}
