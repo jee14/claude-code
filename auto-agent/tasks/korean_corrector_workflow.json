@@ -1,6 +1,6 @@
 {
-  "name": "Korean Text Corrector Full Development",
-  "description": "Build a web service that provides Korean text proofreading, copy editing, and rewriting features",
+  "name": "Korean Text Refiner Full Development",
+  "description": "Build a web service that provides Korean text proofreading, copy editing, and rewriting features - 한국어 문장 다듬기",
   "tasks": [
     {
       "name": "Build Backend API Server",

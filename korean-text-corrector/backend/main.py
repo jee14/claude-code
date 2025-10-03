@@ -1,6 +1,6 @@
 """
-Korean Text Corrector Backend API
-FastAPI server providing Korean text correction services using OpenRouter API
+한국어 문장 다듬기 Backend API
+FastAPI server providing Korean text refinement services using OpenRouter API
 """
 
 from fastapi import FastAPI, HTTPException
@@ -14,8 +14,8 @@ from openai_corrector import OpenAICorrector
 from naver_corrector import NaverCorrector
 
 app = FastAPI(
-    title="Korean Text Corrector API",
-    description="API for correcting Korean text using Naver + OpenRouter",
+    title="한국어 문장 다듬기 API",
+    description="API for refining Korean text using Naver + OpenRouter",
     version="3.1.0"
 )
 
@@ -83,7 +83,7 @@ async def root():
     return {
         "status": "healthy",
         "version": "3.1.0",
-        "message": "Korean Text Corrector API (Naver + OpenRouter)"
+        "message": "한국어 문장 다듬기 API (Naver + OpenRouter)"
     }
 
 @app.get("/health", response_model=HealthResponse)
@@ -92,7 +92,7 @@ async def health_check():
     return {
         "status": "healthy",
         "version": "3.1.0",
-        "message": "Naver + OpenRouter API operational"
+        "message": "한국어 문장 다듬기 - Naver + OpenRouter API operational"
     }
 
 @app.post("/correct", response_model=DetailedCorrectionResponse)

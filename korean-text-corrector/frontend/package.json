@@ -1,5 +1,5 @@
 {
-  "name": "korean-text-corrector",
+  "name": "korean-text-refiner",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -8,10 +8,10 @@
     "start": "next start",
     "lint": "next lint"
   },
-  "keywords": [],
+  "keywords": ["korean", "text", "refiner", "proofreading", "copyediting", "rewriting"],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "한국어 문장 다듬기 - Korean Text Refiner with proofreading, copyediting, and rewriting",
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.14",
     "@types/node": "^24.6.2",

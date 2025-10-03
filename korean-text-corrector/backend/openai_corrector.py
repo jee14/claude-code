@@ -1,6 +1,6 @@
 """
-Korean Text Corrector using OpenRouter API
-OpenRouter API를 사용한 한국어 교정 (Claude 등 다양한 모델 지원)
+Korean Text Refiner using OpenRouter API
+OpenRouter API를 사용한 한국어 문장 다듬기 (Claude 등 다양한 모델 지원)
 """
 import os
 from typing import Dict, List
@@ -8,7 +8,7 @@ import json
 
 
 class OpenAICorrector:
-    """OpenRouter API를 사용한 한국어 교정"""
+    """OpenRouter API를 사용한 한국어 문장 다듬기"""
 
     def __init__(self, api_key: str = None, base_url: str = None, model: str = None):
         self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
@@ -89,7 +89,7 @@ class OpenAICorrector:
             response = client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "당신은 전문 한국어 교정자입니다. 정확하고 자연스러운 한국어로 교정해주세요."},
+                    {"role": "system", "content": "당신은 전문 한국어 문장 다듬기 전문가입니다. 정확하고 자연스러운 한국어로 다듬어주세요."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.3,
