@@ -316,6 +316,24 @@ export default function TextCorrector() {
               </div>
             </button>
           </div>
+
+          {/* Mode Descriptions */}
+          <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+            <div className="grid grid-cols-3 gap-4 text-xs">
+              <div>
+                <span className="font-semibold text-blue-600">교정:</span>
+                <span className="text-slate-600 ml-1">맞춤법, 띄어쓰기, 문장부호 검사</span>
+              </div>
+              <div>
+                <span className="font-semibold text-emerald-600">교열:</span>
+                <span className="text-slate-600 ml-1">교정 + 문맥 일관성, 용어 통일, 중복 제거</span>
+              </div>
+              <div>
+                <span className="font-semibold text-violet-600">윤문:</span>
+                <span className="text-slate-600 ml-1">교정 + 교열 + 문장 구조 개선, 가독성 향상</span>
+              </div>
+            </div>
+          </div>
           
           {isProcessing && (
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12">
