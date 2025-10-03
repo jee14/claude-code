@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/format-python.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [ -f \"$PWD/main.py\" ] && ! python -m py_compile main.py 2>/dev/null; then echo \"❌ Cannot modify files: Python syntax errors exist. Fix them first.\" >&2; exit 2; fi'",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
