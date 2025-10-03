@@ -91,13 +91,12 @@ class NaverCorrector:
                 if errata_count > 0 and 'notag_html' in result_data:
                     corrected_text = result_data['notag_html']
 
-                    # HTML에서 개별 교정 항목 추출 (origin_html과 html 비교)
-                    # 일단 전체 교정만 제공 (개별 교정 내역은 HTML 파싱 필요)
+                    # 교정 요약 정보만 제공 (원본→수정 비교)
                     corrections.append({
                         'type': 'spelling',
                         'original': text,
                         'corrected': corrected_text,
-                        'explanation': f'{errata_count}개 교정됨'
+                        'explanation': f'맞춤법/띄어쓰기 {errata_count}개 수정'
                     })
 
             return {

@@ -109,6 +109,8 @@ async def correct_text(request: CorrectionRequest):
         if not request.text or request.text.strip() == "":
             raise HTTPException(status_code=400, detail="Text cannot be empty")
 
+        print(f"[DEBUG] 받은 원본 텍스트: {request.text}")
+        print(f"[DEBUG] request.text repr: {repr(request.text)}")
         current_text = request.text
         all_corrections = []
 
@@ -155,7 +157,7 @@ async def correct_text(request: CorrectionRequest):
         all_corrections.extend(rewriting_result.get('corrections', []))
         print(f"[3단계] 윤문 완료: {current_text}")
 
-        return {
+        final_response = {
             'original': request.text,
             'corrected': current_text,
             'has_corrections': len(all_corrections) > 0,
@@ -166,6 +168,10 @@ async def correct_text(request: CorrectionRequest):
                 'num_corrections': len(all_corrections)
             }
         }
+        print(f"[DEBUG] 최종 응답: original={final_response['original']}, corrected={final_response['corrected']}")
+        import json
+        print(f"[DEBUG] JSON 직렬화: {json.dumps(final_response, ensure_ascii=False)}")
+        return final_response
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Correction error: {str(e)}")

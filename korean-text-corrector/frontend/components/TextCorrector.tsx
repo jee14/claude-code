@@ -138,6 +138,7 @@ export default function TextCorrector() {
       alert('텍스트는 최대 1000자까지 입력 가능합니다.')
       return
     }
+    if (isProcessing) return // 중복 요청 방지
 
     setIsProcessing(true)
 
@@ -166,10 +167,16 @@ export default function TextCorrector() {
       console.log('Corrections:', data.corrections)
 
       // Transform backend response to frontend format
+      let searchStartIndex = 0
       const corrections: Correction[] = (data.corrections || []).map((c: any, idx: number) => {
-        // Find position of original text
-        const startIndex = data.original.indexOf(c.original)
+        // Find position of original text starting from last found position
+        const startIndex = data.original.indexOf(c.original, searchStartIndex)
         const endIndex = startIndex + c.original.length
+
+        // Update search start index for next iteration
+        if (startIndex >= 0) {
+          searchStartIndex = endIndex
+        }
 
         return {
           id: `${c.type}-${idx}`,
@@ -332,14 +339,6 @@ export default function TextCorrector() {
                 <p className="text-sm text-slate-600">
                   {getModeDescription(result.mode)}
                 </p>
-              </div>
-
-              {/* Original Text */}
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h4 className="text-sm font-semibold text-slate-700 mb-3">원본 텍스트</h4>
-                <div className="text-slate-900 leading-relaxed">
-                  {renderHighlightedText(result.originalText, result.corrections)}
-                </div>
               </div>
 
               {/* Corrected Text */}
