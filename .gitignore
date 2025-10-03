@@ -89,3 +89,6 @@ out/
 
 # Auto-agent cache
 auto-agent/.cache/
+
+# Claude Code usage statistics
+cc.json
