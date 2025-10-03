@@ -5,7 +5,7 @@ FastAPI server providing Korean text correction services using OpenRouter API
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from typing import Optional, List, Dict
 import uvicorn
 
@@ -50,6 +50,12 @@ class CorrectionRequest(BaseModel):
     detailed: Optional[bool] = False
     mode: Optional[str] = "proofreading"  # proofreading, copyediting, rewriting
 
+    @validator('text')
+    def validate_text_length(cls, v):
+        if len(v) > 1000:
+            raise ValueError('Text must not exceed 1000 characters')
+        return v
+
 class QuickCorrectionResponse(BaseModel):
     original: str
     corrected: str
@@ -92,30 +98,74 @@ async def health_check():
 @app.post("/correct", response_model=DetailedCorrectionResponse)
 async def correct_text(request: CorrectionRequest):
     """
-    Text correction endpoint using Naver (proofreading) + OpenRouter (copyediting, rewriting)
-    Returns corrected text with detailed analysis
+    Text correction endpoint with sequential processing
 
     Modes:
-    - proofreading: 맞춤법, 띄어쓰기, 문장부호 교정 (Naver API 우선, 실패시 OpenRouter)
-    - copyediting: 문맥 일관성, 용어 통일, 중복 표현 검토 (OpenRouter)
-    - rewriting: 문장 구조 개선, 가독성 향상 (OpenRouter)
+    - proofreading: 교정만 수행 (Naver API)
+    - copyediting: 교정 → 교열 순차 수행 (Naver → OpenRouter)
+    - rewriting: 교정 → 교열 → 윤문 순차 수행 (Naver → OpenRouter → OpenRouter)
     """
     try:
         if not request.text or request.text.strip() == "":
             raise HTTPException(status_code=400, detail="Text cannot be empty")
 
-        # proofreading 모드는 Naver API 사용
-        if request.mode == "proofreading":
-            analysis = naver_corrector.correct(request.text, request.mode)
-            # Naver API 실패시 OpenRouter로 폴백
-            if 'error' in analysis:
-                print(f"Naver API 실패, OpenRouter로 폴백: {analysis['error']}")
-                analysis = openai_corrector.correct(request.text, request.mode)
-        else:
-            # copyediting, rewriting은 OpenRouter 사용
-            analysis = openai_corrector.correct(request.text, request.mode)
+        current_text = request.text
+        all_corrections = []
 
-        return analysis
+        # 1단계: 교정 (proofreading) - 모든 모드에서 실행
+        print(f"[1단계] 교정 시작: {current_text}")
+        proofreading_result = naver_corrector.correct(current_text, "proofreading")
+        if 'error' in proofreading_result:
+            print(f"Naver API 실패, OpenRouter로 폴백: {proofreading_result['error']}")
+            proofreading_result = openai_corrector.correct(current_text, "proofreading")
+
+        current_text = proofreading_result['corrected']
+        all_corrections.extend(proofreading_result.get('corrections', []))
+        print(f"[1단계] 교정 완료: {current_text}")
+
+        # proofreading 모드면 여기서 종료
+        if request.mode == "proofreading":
+            return proofreading_result
+
+        # 2단계: 교열 (copyediting) - copyediting, rewriting 모드에서 실행
+        print(f"[2단계] 교열 시작: {current_text}")
+        copyediting_result = openai_corrector.correct(current_text, "copyediting")
+        current_text = copyediting_result['corrected']
+        all_corrections.extend(copyediting_result.get('corrections', []))
+        print(f"[2단계] 교열 완료: {current_text}")
+
+        # copyediting 모드면 여기서 종료
+        if request.mode == "copyediting":
+            return {
+                'original': request.text,
+                'corrected': current_text,
+                'has_corrections': len(all_corrections) > 0,
+                'corrections': all_corrections,
+                'statistics': {
+                    'original_length': len(request.text),
+                    'corrected_length': len(current_text),
+                    'num_corrections': len(all_corrections)
+                }
+            }
+
+        # 3단계: 윤문 (rewriting) - rewriting 모드에서만 실행
+        print(f"[3단계] 윤문 시작: {current_text}")
+        rewriting_result = openai_corrector.correct(current_text, "rewriting")
+        current_text = rewriting_result['corrected']
+        all_corrections.extend(rewriting_result.get('corrections', []))
+        print(f"[3단계] 윤문 완료: {current_text}")
+
+        return {
+            'original': request.text,
+            'corrected': current_text,
+            'has_corrections': len(all_corrections) > 0,
+            'corrections': all_corrections,
+            'statistics': {
+                'original_length': len(request.text),
+                'corrected_length': len(current_text),
+                'num_corrections': len(all_corrections)
+            }
+        }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Correction error: {str(e)}")

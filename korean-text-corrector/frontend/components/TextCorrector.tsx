@@ -134,11 +134,14 @@ export default function TextCorrector() {
 
   const handleCorrection = async (mode: CorrectionType) => {
     if (!inputText.trim()) return
+    if (inputText.length > 1000) {
+      alert('텍스트는 최대 1000자까지 입력 가능합니다.')
+      return
+    }
 
     setIsProcessing(true)
 
     try {
-      // Call backend API with detailed analysis
       const response = await fetch('http://localhost:8000/correct/detailed', {
         method: 'POST',
         headers: {
@@ -187,23 +190,7 @@ export default function TextCorrector() {
       })
     } catch (error) {
       console.error('Correction error:', error)
-      // Fallback to mock if API fails
-      const corrections = mockCorrections[mode](inputText)
-      let correctedText = inputText
-
-      corrections.sort((a, b) => b.startIndex - a.startIndex).forEach(correction => {
-        correctedText =
-          correctedText.slice(0, correction.startIndex) +
-          correction.corrected +
-          correctedText.slice(correction.endIndex)
-      })
-
-      setResult({
-        originalText: inputText,
-        correctedText,
-        corrections: corrections.sort((a, b) => a.startIndex - b.startIndex),
-        mode
-      })
+      alert('교정 중 오류가 발생했습니다. 다시 시도해주세요.')
     } finally {
       setIsProcessing(false)
     }
@@ -271,10 +258,14 @@ export default function TextCorrector() {
             <textarea
               id="input-text"
               className="w-full h-40 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-              placeholder="교정할 텍스트를 입력하세요..."
+              placeholder="교정할 텍스트를 입력하세요... (최대 1000자)"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
+              maxLength={1000}
             />
+            <div className="text-right text-sm text-gray-500 mt-1">
+              {inputText.length} / 1000자
+            </div>
           </div>
           
           <div className="flex gap-4">
@@ -286,23 +277,23 @@ export default function TextCorrector() {
               <span className="font-medium">교정</span>
               <span className="block text-xs mt-1 opacity-90">맞춤법 • 띄어쓰기</span>
             </button>
-            
+
             <button
               onClick={() => handleCorrection('copyediting')}
               disabled={!inputText.trim() || isProcessing}
               className="flex-1 py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             >
               <span className="font-medium">교열</span>
-              <span className="block text-xs mt-1 opacity-90">문맥 • 일관성</span>
+              <span className="block text-xs mt-1 opacity-90">교정 → 교열</span>
             </button>
-            
+
             <button
               onClick={() => handleCorrection('rewriting')}
               disabled={!inputText.trim() || isProcessing}
               className="flex-1 py-3 px-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             >
               <span className="font-medium">윤문</span>
-              <span className="block text-xs mt-1 opacity-90">문장 개선</span>
+              <span className="block text-xs mt-1 opacity-90">교정 → 교열 → 윤문</span>
             </button>
           </div>
           
@@ -310,7 +301,7 @@ export default function TextCorrector() {
             <div className="text-center py-8">
               <div className="inline-flex items-center gap-2">
                 <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
-                <span className="text-gray-600">분석 중...</span>
+                <span className="text-gray-600">처리 중...</span>
               </div>
             </div>
           )}
