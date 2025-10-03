@@ -9,13 +9,14 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict
 import uvicorn
 
-# Import correction engine
+# Import correction engines
 from openai_corrector import OpenAICorrector
+from naver_corrector import NaverCorrector
 
 app = FastAPI(
     title="Korean Text Corrector API",
-    description="API for correcting Korean text using OpenRouter (Claude, GPT, etc.)",
-    version="3.0.0"
+    description="API for correcting Korean text using Naver + OpenRouter",
+    version="3.1.0"
 )
 
 # Configure JSON response to use UTF-8 encoding with ensure_ascii=False
@@ -66,16 +67,17 @@ class HealthResponse(BaseModel):
     version: str
     message: str
 
-# Initialize OpenRouter corrector
+# Initialize correctors
 openai_corrector = OpenAICorrector()
+naver_corrector = NaverCorrector()
 
 @app.get("/", response_model=HealthResponse)
 async def root():
     """Root endpoint - API health check"""
     return {
         "status": "healthy",
-        "version": "3.0.0",
-        "message": "Korean Text Corrector API (OpenRouter)"
+        "version": "3.1.0",
+        "message": "Korean Text Corrector API (Naver + OpenRouter)"
     }
 
 @app.get("/health", response_model=HealthResponse)
@@ -83,27 +85,35 @@ async def health_check():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "version": "3.0.0",
-        "message": "OpenRouter API operational"
+        "version": "3.1.0",
+        "message": "Naver + OpenRouter API operational"
     }
 
 @app.post("/correct", response_model=DetailedCorrectionResponse)
 async def correct_text(request: CorrectionRequest):
     """
-    Text correction endpoint using OpenRouter API
+    Text correction endpoint using Naver (proofreading) + OpenRouter (copyediting, rewriting)
     Returns corrected text with detailed analysis
 
     Modes:
-    - proofreading: 맞춤법, 띄어쓰기, 문장부호 교정
-    - copyediting: 문맥 일관성, 용어 통일, 중복 표현 검토
-    - rewriting: 문장 구조 개선, 가독성 향상
+    - proofreading: 맞춤법, 띄어쓰기, 문장부호 교정 (Naver API 우선, 실패시 OpenRouter)
+    - copyediting: 문맥 일관성, 용어 통일, 중복 표현 검토 (OpenRouter)
+    - rewriting: 문장 구조 개선, 가독성 향상 (OpenRouter)
     """
     try:
         if not request.text or request.text.strip() == "":
             raise HTTPException(status_code=400, detail="Text cannot be empty")
 
-        # Use OpenRouter for all corrections
-        analysis = openai_corrector.correct(request.text, request.mode)
+        # proofreading 모드는 Naver API 사용
+        if request.mode == "proofreading":
+            analysis = naver_corrector.correct(request.text, request.mode)
+            # Naver API 실패시 OpenRouter로 폴백
+            if 'error' in analysis:
+                print(f"Naver API 실패, OpenRouter로 폴백: {analysis['error']}")
+                analysis = openai_corrector.correct(request.text, request.mode)
+        else:
+            # copyediting, rewriting은 OpenRouter 사용
+            analysis = openai_corrector.correct(request.text, request.mode)
 
         return analysis
 
