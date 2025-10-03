@@ -5,6 +5,7 @@ OpenRouter API를 사용한 한국어 문장 다듬기 (Claude 등 다양한 모
 import os
 from typing import Dict, List
 import json
+from langfuse import Langfuse
 
 
 class OpenAICorrector:
@@ -14,6 +15,19 @@ class OpenAICorrector:
         self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
         self.base_url = base_url or os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
         self.model = model or os.getenv("OPENROUTER_MODEL", "anthropic/claude-sonnet-4-5")
+
+        # Initialize Langfuse
+        self.langfuse = Langfuse(
+            public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
+            secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
+            host=os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
+        )
+        # 각 모드별로 별도 프롬프트 사용
+        self.prompt_names = {
+            "proofreading": "korean-text-proofreading",
+            "copyediting": "korean-text-copyediting",
+            "rewriting": "korean-text-rewriting"
+        }
 
         if not self.api_key:
             print("Warning: OPENROUTER_API_KEY not set. Corrector will not work.")
@@ -39,9 +53,17 @@ class OpenAICorrector:
                 base_url=self.base_url
             )
 
-            # 모드별 프롬프트
-            prompts = {
-                "proofreading": """다음 한국어 텍스트의 맞춤법, 띄어쓰기, 문장부호를 교정해주세요.
+            # Langfuse에서 프롬프트 가져오기
+            try:
+                prompt_name = self.prompt_names.get(mode, "korean-text-proofreading")
+                prompt_obj = self.langfuse.get_prompt(prompt_name)
+                prompt_template = prompt_obj.prompt
+                system_message = prompt_obj.config.get("system_message", "당신은 전문 한국어 문장 다듬기 전문가입니다.")
+            except Exception as e:
+                print(f"Langfuse prompt fetch error: {e}, using fallback prompts")
+                # Fallback prompts
+                prompts = {
+                    "proofreading": """다음 한국어 텍스트의 맞춤법, 띄어쓰기, 문장부호를 교정해주세요.
 
 띄어쓰기 규칙을 반드시 적용하세요:
 - 보조 용언은 띄어쓰기: "하고있어요" → "하고 있어요", "하지않아요" → "하지 않아요"
@@ -58,7 +80,7 @@ class OpenAICorrector:
     {{"original": "원본", "corrected": "수정본", "type": "spelling|spacing|punctuation", "explanation": "설명"}}
   ]
 }}""",
-                "copyediting": """다음 한국어 텍스트를 교열해주세요. 문맥 일관성, 용어 통일, 중복 표현을 검토하고 개선해주세요.
+                    "copyediting": """다음 한국어 텍스트를 교열해주세요. 문맥 일관성, 용어 통일, 중복 표현을 검토하고 개선해주세요.
 
 입력 텍스트:
 {text}
@@ -70,7 +92,7 @@ class OpenAICorrector:
     {{"original": "원본", "corrected": "수정본", "type": "consistency|terminology|redundancy", "explanation": "설명"}}
   ]
 }}""",
-                "rewriting": """다음 한국어 텍스트를 윤문해주세요. 문장 구조를 개선하고 가독성을 향상시켜주세요.
+                    "rewriting": """다음 한국어 텍스트를 윤문해주세요. 문장 구조를 개선하고 가독성을 향상시켜주세요.
 
 입력 텍스트:
 {text}
@@ -82,14 +104,16 @@ class OpenAICorrector:
     {{"original": "원본", "corrected": "수정본", "type": "structure|clarity|style", "explanation": "설명"}}
   ]
 }}"""
-            }
+                }
+                prompt_template = prompts.get(mode, prompts["proofreading"])
+                system_message = "당신은 전문 한국어 문장 다듬기 전문가입니다. 정확하고 자연스러운 한국어로 다듬어주세요."
 
-            prompt = prompts.get(mode, prompts["proofreading"]).format(text=text)
+            prompt = prompt_template.format(text=text)
 
             response = client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "당신은 전문 한국어 문장 다듬기 전문가입니다. 정확하고 자연스러운 한국어로 다듬어주세요."},
+                    {"role": "system", "content": system_message},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.3,
