@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: '한국어 교정 도구',
+  title: '한국어 문장 다듬기',
   description: '교정, 교열, 윤문을 한 번에',
 }
 
