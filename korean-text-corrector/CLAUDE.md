@@ -1,4 +1,4 @@
-# 한국어 교정 도구 프로젝트
+# 한국어 문장 다듬기
 
 ## 프로젝트 개요
 한국어 텍스트의 교정, 교열, 윤문을 제공하는 웹 애플리케이션입니다.
@@ -28,8 +28,10 @@ korean-text-corrector/
 3. **윤문 (Rewriting)**: 문장 구조 개선, 가독성 향상
 
 ## 기술 스택
-- **Frontend**: Next.js 15, TypeScript, Tailwind CSS
-- **Backend**: (추후 구현 예정 - Python/FastAPI 또는 Node.js)
+- **Frontend**: Next.js 15, TypeScript, Tailwind CSS v4
+- **Backend**: FastAPI + Python
+  - 네이버 맞춤법 검사 API (교정)
+  - OpenRouter API (Claude Sonnet 4.5) (교열, 윤문)
 
 ## 개발 및 실행
 ```bash
@@ -37,17 +39,31 @@ korean-text-corrector/
 cd frontend
 npm install
 npm run dev
+
+# 백엔드 실행
+cd backend
+pip install -r requirements.txt
+python main.py
 ```
 
 ## 구현 상태
-- ✅ 프론트엔드 UI 구현
-- ✅ 목업 교정 로직 구현
-- ⏳ 백엔드 API 서버 구현 예정
-- ⏳ 실제 한국어 처리 엔진 연동 예정
+- ✅ 프론트엔드 UI 구현 (v0.dev 스타일)
+- ✅ 백엔드 API 서버 구현 (FastAPI)
+- ✅ 네이버 맞춤법 검사 API 연동 (동적 passportKey 추출)
+- ✅ OpenRouter API 연동 (Claude Sonnet 4.5)
+- ✅ 순차 처리 로직 (교정 → 교열 → 윤문)
+- ✅ 1000자 입력 제한
 
-## 향후 계획
-1. 백엔드 API 서버 구축
-2. 한국어 NLP 라이브러리 연동 (KoNLPy, Kiwipiepy 등)
-3. 네이버/카카오 맞춤법 검사 API 연동
-4. 사용자 인증 및 히스토리 기능
-5. 배치 처리 기능
+## 주요 기능 상세
+### 교정 (Proofreading)
+- 네이버 맞춤법 검사 API 사용
+- 맞춤법, 띄어쓰기, 문장부호 자동 교정
+- 실패 시 OpenRouter로 자동 폴백
+
+### 교열 (Copy Editing)
+- 교정 후 OpenRouter API로 교열 수행
+- 문맥 일관성, 용어 통일, 중복 표현 검토
+
+### 윤문 (Rewriting)
+- 교정 → 교열 후 윤문 수행
+- 문장 구조 개선, 가독성 향상
