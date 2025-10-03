@@ -245,122 +245,138 @@ export default function TextCorrector() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold mb-2">한국어 문장 다듬기</h1>
-        <p className="text-gray-600 mb-8">텍스트를 입력하고 원하는 기능을 선택하세요.</p>
-        
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="max-w-5xl mx-auto px-6 py-12">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-3">
+            한국어 문장 다듬기
+          </h1>
+          <p className="text-slate-600 text-lg">텍스트를 입력하고 원하는 기능을 선택하세요.</p>
+        </div>
+
+        {/* Main Content */}
         <div className="space-y-6">
-          <div>
-            <label htmlFor="input-text" className="block text-sm font-medium text-gray-700 mb-2">
-              텍스트 입력
-            </label>
+          {/* Input Section */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
             <textarea
               id="input-text"
-              className="w-full h-40 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-              placeholder="텍스트를 입력하세요... (최대 1000자)"
+              className="w-full h-48 p-4 border-0 focus:ring-0 focus:outline-none resize-none text-slate-900 placeholder:text-slate-400"
+              placeholder="텍스트를 입력하세요."
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               maxLength={1000}
             />
-            <div className="text-right text-sm text-gray-500 mt-1">
-              {inputText.length} / 1000자
+            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+              <div className="text-sm text-slate-500">
+                {inputText.length} / 1000자
+              </div>
             </div>
           </div>
-          
-          <div className="flex gap-4">
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => handleCorrection('proofreading')}
               disabled={!inputText.trim() || isProcessing}
-              className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="group relative px-6 py-4 bg-white border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-200 disabled:hover:bg-white transition-all duration-200"
             >
-              <span className="font-medium">교정</span>
-              <span className="block text-xs mt-1 opacity-90">맞춤법 • 띄어쓰기</span>
+              <div className="text-left">
+                <div className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">교정</div>
+                <div className="text-xs text-slate-500 mt-1">맞춤법 • 띄어쓰기</div>
+              </div>
             </button>
 
             <button
               onClick={() => handleCorrection('copyediting')}
               disabled={!inputText.trim() || isProcessing}
-              className="flex-1 py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="group relative px-6 py-4 bg-white border-2 border-slate-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-200 disabled:hover:bg-white transition-all duration-200"
             >
-              <span className="font-medium">교열</span>
-              <span className="block text-xs mt-1 opacity-90">일관성 • 중복 제거</span>
+              <div className="text-left">
+                <div className="font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">교열</div>
+                <div className="text-xs text-slate-500 mt-1">일관성 • 중복 제거</div>
+              </div>
             </button>
 
             <button
               onClick={() => handleCorrection('rewriting')}
               disabled={!inputText.trim() || isProcessing}
-              className="flex-1 py-3 px-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="group relative px-6 py-4 bg-white border-2 border-slate-200 rounded-xl hover:border-violet-500 hover:bg-violet-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-200 disabled:hover:bg-white transition-all duration-200"
             >
-              <span className="font-medium">윤문</span>
-              <span className="block text-xs mt-1 opacity-90">문장 구조 개선</span>
+              <div className="text-left">
+                <div className="font-semibold text-slate-900 group-hover:text-violet-600 transition-colors">윤문</div>
+                <div className="text-xs text-slate-500 mt-1">문장 구조 개선</div>
+              </div>
             </button>
           </div>
           
           {isProcessing && (
-            <div className="text-center py-8">
-              <div className="inline-flex items-center gap-2">
-                <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
-                <span className="text-gray-600">처리 중...</span>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-8 h-8 border-3 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
+                <span className="text-slate-600 font-medium">처리 중...</span>
               </div>
             </div>
           )}
           
           {result && !isProcessing && (
             <div className="space-y-6 animate-in slide-in-from-bottom duration-300">
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-medium text-gray-700 mb-2">
+              {/* Result Header */}
+              <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-2xl p-6 border border-slate-200">
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">
                   {result.mode === 'proofreading' && '교정'}
                   {result.mode === 'copyediting' && '교열'}
                   {result.mode === 'rewriting' && '윤문'}
                   {' '}결과
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-slate-600">
                   {getModeDescription(result.mode)}
                 </p>
               </div>
-              
-              <div>
-                <h4 className="font-medium text-gray-700 mb-2">원본 텍스트</h4>
-                <div className="p-4 bg-gray-50 rounded-lg leading-relaxed">
+
+              {/* Original Text */}
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <h4 className="text-sm font-semibold text-slate-700 mb-3">원본 텍스트</h4>
+                <div className="text-slate-900 leading-relaxed">
                   {renderHighlightedText(result.originalText, result.corrections)}
                 </div>
               </div>
-              
-              <div>
-                <h4 className="font-medium text-gray-700 mb-2">수정된 텍스트</h4>
-                <div className="p-4 bg-blue-50 rounded-lg leading-relaxed">
+
+              {/* Corrected Text */}
+              <div className="bg-white rounded-2xl shadow-sm border border-blue-200 p-6">
+                <h4 className="text-sm font-semibold text-blue-700 mb-3">수정된 텍스트</h4>
+                <div className="text-slate-900 leading-relaxed">
                   {result.correctedText}
                 </div>
               </div>
               
               {result.corrections.length > 0 && (
-                <div>
-                  <h4 className="font-medium text-gray-700 mb-3">
-                    수정 내역 ({result.corrections.length}개)
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                  <h4 className="text-sm font-semibold text-slate-700 mb-4">
+                    수정 내역 <span className="text-slate-500">({result.corrections.length}개)</span>
                   </h4>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {result.corrections.map((correction) => (
                       <div
                         key={correction.id}
-                        className="flex gap-3 p-4 bg-white border border-gray-200 rounded-lg"
+                        className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors"
                       >
-                        <div className={`w-1 flex-shrink-0 rounded ${
-                          correction.type === 'spelling' ? 'bg-red-500' :
-                          correction.type === 'grammar' ? 'bg-amber-500' :
-                          'bg-blue-500'
+                        <div className={`w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 ${
+                          correction.type === 'spelling' ? 'bg-red-400' :
+                          correction.type === 'grammar' ? 'bg-amber-400' :
+                          'bg-blue-400'
                         }`} />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-gray-500 line-through text-sm">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="text-slate-400 line-through text-sm">
                               {correction.original}
                             </span>
-                            <span className="text-gray-400">→</span>
-                            <span className="font-medium text-green-600">
+                            <span className="text-slate-300">→</span>
+                            <span className="font-medium text-emerald-600 text-sm">
                               {correction.corrected}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-xs text-slate-600 leading-relaxed">
                             {correction.explanation}
                           </p>
                         </div>
@@ -369,21 +385,6 @@ export default function TextCorrector() {
                   </div>
                 </div>
               )}
-              
-              <div className="flex items-center gap-6 text-sm text-gray-500">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span>맞춤법</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-                  <span>문법</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <span>문체</span>
-                </div>
-              </div>
             </div>
           )}
         </div>
