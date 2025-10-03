@@ -1,6 +1,6 @@
 """
 Korean Text Corrector Backend API
-FastAPI server providing Korean text correction services
+FastAPI server providing Korean text correction services using OpenRouter API
 """
 
 from fastapi import FastAPI, HTTPException
@@ -10,14 +10,12 @@ from typing import Optional, List, Dict
 import uvicorn
 
 # Import correction engine
-from correction_rules import KoreanCorrector, quick_correct, detailed_correct
-from korean_spell_checker import KoreanSpellChecker
 from openai_corrector import OpenAICorrector
 
 app = FastAPI(
     title="Korean Text Corrector API",
-    description="API for correcting Korean text spelling, spacing, and punctuation",
-    version="2.0.0"
+    description="API for correcting Korean text using OpenRouter (Claude, GPT, etc.)",
+    version="3.0.0"
 )
 
 # Configure JSON response to use UTF-8 encoding with ensure_ascii=False
@@ -68,9 +66,7 @@ class HealthResponse(BaseModel):
     version: str
     message: str
 
-# Initialize correctors
-corrector = KoreanCorrector()
-spell_checker = KoreanSpellChecker()
+# Initialize OpenRouter corrector
 openai_corrector = OpenAICorrector()
 
 @app.get("/", response_model=HealthResponse)
@@ -78,8 +74,8 @@ async def root():
     """Root endpoint - API health check"""
     return {
         "status": "healthy",
-        "version": "2.0.0",
-        "message": "Korean Text Corrector API is running"
+        "version": "3.0.0",
+        "message": "Korean Text Corrector API (OpenRouter)"
     }
 
 @app.get("/health", response_model=HealthResponse)
@@ -87,36 +83,15 @@ async def health_check():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "version": "2.0.0",
-        "message": "All systems operational"
+        "version": "3.0.0",
+        "message": "OpenRouter API operational"
     }
 
-@app.post("/correct", response_model=QuickCorrectionResponse)
+@app.post("/correct", response_model=DetailedCorrectionResponse)
 async def correct_text(request: CorrectionRequest):
     """
-    Quick text correction endpoint
-    Returns corrected text without detailed analysis
-    """
-    try:
-        if not request.text or request.text.strip() == "":
-            raise HTTPException(status_code=400, detail="Text cannot be empty")
-        
-        corrected = quick_correct(request.text)
-        
-        return {
-            "original": request.text,
-            "corrected": corrected,
-            "has_corrections": request.text != corrected
-        }
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Correction error: {str(e)}")
-
-@app.post("/correct/detailed", response_model=DetailedCorrectionResponse)
-async def correct_text_detailed(request: CorrectionRequest):
-    """
-    Detailed text correction endpoint using OpenAI GPT
-    Returns corrected text with detailed analysis and correction log
+    Text correction endpoint using OpenRouter API
+    Returns corrected text with detailed analysis
 
     Modes:
     - proofreading: 맞춤법, 띄어쓰기, 문장부호 교정
@@ -127,7 +102,7 @@ async def correct_text_detailed(request: CorrectionRequest):
         if not request.text or request.text.strip() == "":
             raise HTTPException(status_code=400, detail="Text cannot be empty")
 
-        # Use OpenAI corrector for reliable results
+        # Use OpenRouter for all corrections
         analysis = openai_corrector.correct(request.text, request.mode)
 
         return analysis
@@ -135,47 +110,12 @@ async def correct_text_detailed(request: CorrectionRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Correction error: {str(e)}")
 
-@app.post("/analyze")
-async def analyze_text(request: CorrectionRequest):
+@app.post("/correct/detailed", response_model=DetailedCorrectionResponse)
+async def correct_text_detailed(request: CorrectionRequest):
     """
-    Analyze text and return detailed information
+    Alias for /correct endpoint (for backward compatibility)
     """
-    try:
-        if not request.text or request.text.strip() == "":
-            raise HTTPException(status_code=400, detail="Text cannot be empty")
-        
-        analysis = corrector.analyze_text(request.text)
-        
-        return analysis
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analysis error: {str(e)}")
-
-@app.get("/rules/spelling")
-async def get_spelling_rules():
-    """Get all spelling correction rules"""
-    return {
-        "rules": corrector.rules.get_spelling_corrections(),
-        "count": len(corrector.rules.get_spelling_corrections())
-    }
-
-@app.get("/rules/spacing")
-async def get_spacing_rules():
-    """Get all spacing pattern rules"""
-    patterns = corrector.rules.get_spacing_patterns()
-    return {
-        "patterns": [{"pattern": p[0], "replacement": p[1]} for p in patterns],
-        "count": len(patterns)
-    }
-
-@app.get("/rules/punctuation")
-async def get_punctuation_rules():
-    """Get all punctuation rules"""
-    patterns = corrector.rules.get_punctuation_patterns()
-    return {
-        "patterns": [{"pattern": p[0], "replacement": p[1]} for p in patterns],
-        "count": len(patterns)
-    }
+    return await correct_text(request)
 
 if __name__ == "__main__":
     uvicorn.run(
