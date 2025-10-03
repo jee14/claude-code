@@ -284,7 +284,7 @@ export default function TextCorrector() {
               className="flex-1 py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             >
               <span className="font-medium">교열</span>
-              <span className="block text-xs mt-1 opacity-90">교정 → 교열</span>
+              <span className="block text-xs mt-1 opacity-90">일관성 • 중복 제거</span>
             </button>
 
             <button
@@ -293,7 +293,7 @@ export default function TextCorrector() {
               className="flex-1 py-3 px-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             >
               <span className="font-medium">윤문</span>
-              <span className="block text-xs mt-1 opacity-90">교정 → 교열 → 윤문</span>
+              <span className="block text-xs mt-1 opacity-90">문장 구조 개선</span>
             </button>
           </div>
           
