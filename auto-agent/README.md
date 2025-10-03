@@ -36,8 +36,15 @@ Builder와 Evaluator 에이전트가 서로 대화하며 자동으로 프로젝�
 
 ## 설치
 
+### CLI 버전
 ```bash
 pip install -r requirements.txt
+```
+
+### AutoGen Studio (GUI 버전)
+```bash
+pip install -U autogenstudio
+playwright install chromium  # 브라우저 자동화 기능용
 ```
 
 ## 설정
@@ -66,13 +73,32 @@ OPENROUTER_MODEL=anthropic/claude-sonnet-4.5
 
 ## 사용법
 
-### 단일 작업 실행
+### 🎨 AutoGen Studio GUI (추천)
+
+웹 기반 GUI를 통해 시각적으로 에이전트를 관리하고 워크플로우를 구성할 수 있습니다:
+
+```bash
+# AutoGen Studio 실행
+autogenstudio ui --port 8081
+
+# 브라우저에서 접속
+# http://localhost:8081
+```
+
+**AutoGen Studio 기능**:
+- 🎯 시각적 에이전트 설정 및 관리
+- 📊 실시간 대화 내역 확인
+- 🔧 드래그 앤 드롭으로 워크플로우 구성
+- 💬 채팅 인터페이스로 에이전트와 대화
+- 📈 실행 결과 및 메트릭 시각화
+
+### CLI - 단일 작업 실행
 
 ```bash
 python main.py "FastAPI로 TODO API를 만들어주세요"
 ```
 
-### 🆕 연속 작업 실행 (워크플로우)
+### CLI - 연속 작업 실행 (워크플로우)
 
 워크플로우 매니저를 사용하여 여러 작업을 순차적으로 실행할 수 있습니다:
 
